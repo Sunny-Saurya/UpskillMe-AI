@@ -1,4 +1,5 @@
 import { API_PATHS } from "./apiPaths";
+import { BASE_URL } from "./apiPaths";
 import axiosInstance from "./axiosInstance";
 
 /**
