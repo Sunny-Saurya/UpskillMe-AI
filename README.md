@@ -9,17 +9,27 @@ UpskillMe AI is a full-stack modern web app to help users prepare for job interv
 UPSKILLME-AI
 ├── backend/            → Node.js + Express server
 │   ├── config/         → DB config
+
 │   ├── controllers/    → API logic (AI, auth, session, question)
+
 │   ├── middlewares/    → Auth & file upload middleware
+
 │   ├── models/         → Mongoose models (User, Session, Question)
+
 │   ├── routes/         → Express routes
+
 │   ├── uploads/        → File uploads folder
+
 │   ├── utils/          → Prompt templates etc.
+
 │   ├── server.js       → Entry point for backend
 │
 ├── Frontend/           → React frontend
+
 │   ├── public/         → Static HTML and assets
+
 │   ├── src/
+
 │   │   ├── assets/     → Images and logos
 │   │   ├── components/ → UI components
 │   │   │   ├── Cards/
@@ -27,12 +37,17 @@ UPSKILLME-AI
 │   │   │   ├── layouts/
 │   │   │   ├── Loader/
 │   │   │   ├── Drawer.jsx, Modal.jsx
+
 │   │   ├── context/    → Global user context
+
 │   │   ├── pages/      → Page components
+
 │   │   │   ├── Auth/   → Login/Signup
 │   │   │   ├── Home/   → Dashboard & session form
 │   │   │   ├── InterviewPrep/ → AI response & questions
+
 │   │   ├── utils/      → API paths, axios config
+
 │   │   ├── App.jsx     → Main App component
 │   │   ├── index.jsx   → ReactDOM render
 │
