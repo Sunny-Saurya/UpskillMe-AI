@@ -1,5 +1,4 @@
 import { API_PATHS } from "./apiPaths";
-import { BASE_URL } from "./apiPaths";
 import axiosInstance from "./axiosInstance";
 
 /**
@@ -16,7 +15,7 @@ const uploadImage = async (imageFile) => {
   formData.append("image", imageFile);
 
   try {
-    const response = await axiosInstance.post(`${BASE_URL}/api/auth/upload-image`, formData, {
+    const response = await axiosInstance.post(API_PATHS.IMAGE.UPLOAD_IMAGE, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
