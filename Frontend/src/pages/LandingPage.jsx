@@ -10,6 +10,9 @@ import Login from "./Auth/Login";
 import SignUp from "./Auth/SignUp";
 import { APP_FEATURES } from "../utils/data";
 import ProfileInfoCard from '../components/Cards/ProfileInfoCard';
+import { AnimatedTestimonialsDemo } from '../components/Testimonial';
+import CompactFooter from '../components/Footer';
+import { AnimatedTestimonials } from '../components/ui/animated-testimonials';
 
 const LandingPage = () => {
   const { user } = useContext(UserContext);
@@ -259,8 +262,10 @@ const LandingPage = () => {
         </div>
       </section>
 
+      <AnimatedTestimonialsDemo />
+      
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-amber-500 to-amber-600">
+      <section className="py-20 bg-gradient-to-r from-white to-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -269,10 +274,10 @@ const LandingPage = () => {
             viewport={{ once: true }}
             className="bg-white/10 backdrop-blur-sm p-8 rounded-3xl border border-white/20"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-black mb-6">
               Ready to Ace Your Next Interview?
             </h2>
-            <p className="text-xl text-amber-100 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-amber-600 mb-8 max-w-3xl mx-auto">
               Join thousands of professionals who landed their dream jobs with our AI coach
             </p>
             <motion.button
@@ -288,26 +293,8 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center mb-6 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center mr-3">
-                <LuSparkles className="text-white text-lg" />
-              </div>
-              <span className="text-xl font-bold text-white">UpskillMe AI</span>
-            </div>
-            <div className="flex gap-6">
-              <a href="#" className="hover:text-amber-400 transition">Privacy</a>
-              <a href="#" className="hover:text-amber-400 transition">Terms</a>
-              <a href="#" className="hover:text-amber-400 transition">Contact</a>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
-            © {new Date().getFullYear()} UpskillMe AI. All rights reserved.
-          </div>
-        </div>
-      </footer>
+
+      <CompactFooter />
 
       {/* Auth Modal */}
       <Modal
