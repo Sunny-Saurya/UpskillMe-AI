@@ -5,7 +5,7 @@ const axios = require("axios");
 // ======================================
 const extractJSON = (rawText) => {
   try {
-    // Remove markdown if exists
+    // Remove markdown formatting
     const cleanedText = rawText
       .replace(/```json/g, "")
       .replace(/```/g, "")
@@ -27,7 +27,7 @@ const extractJSON = (rawText) => {
     throw new Error("Invalid JSON response");
   } catch (error) {
     console.error(
-      "JSON Extraction Error:",
+      "❌ JSON Extraction Error:",
       error
     );
 
@@ -82,7 +82,7 @@ Format:
 [
   {
     "question": "What is React?",
-    "answer": "React is a JavaScript library for building UI."
+    "answer": "React is a JavaScript library for building user interfaces."
   }
 ]
 `;
@@ -93,13 +93,13 @@ Format:
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "mistralai/mistral-7b-instruct:free",
+        model: "google/gemma-2-9b-it:free",
 
         messages: [
           {
             role: "system",
             content:
-              "You are a JSON generator. Always return only valid JSON.",
+              "You are a JSON generator. Always return ONLY valid JSON array.",
           },
           {
             role: "user",
@@ -115,30 +115,49 @@ Format:
           "Content-Type":
             "application/json",
         },
+
+        timeout: 60000,
       }
     );
 
     // ==================================
-    // Extract Response
+    // Raw AI Response
     // ==================================
     const rawText =
       response?.data?.choices?.[0]?.message
         ?.content || "";
 
     console.log(
-      "RAW QUESTIONS RESPONSE:"
+      "✅ RAW QUESTIONS RESPONSE:"
     );
+
     console.log(rawText);
 
     // ==================================
-    // Parse JSON
+    // Parse JSON Safely
     // ==================================
-    const questions = extractJSON(rawText);
+    let questions = [];
+
+    try {
+      questions = extractJSON(rawText);
+    } catch (err) {
+      console.error(
+        "❌ JSON Parse Failed:",
+        err
+      );
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "AI returned invalid JSON",
+      });
+    }
 
     console.log(
-      "PARSED QUESTIONS:",
-      questions
+      "✅ PARSED QUESTIONS:"
     );
+
+    console.log(questions);
 
     // ==================================
     // Validation
@@ -158,17 +177,20 @@ Format:
     // ==================================
     // Success Response
     // ==================================
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       questions,
     });
   } catch (error) {
-    console.error(
-      "Generate Questions Error:",
-      error?.response?.data || error.message
-    );
+    console.error("❌ FULL AI ERROR:");
 
-    res.status(500).json({
+    console.error(error);
+
+    console.error("❌ RESPONSE:");
+
+    console.error(error?.response?.data);
+
+    return res.status(500).json({
       success: false,
       message:
         "Failed to generate questions",
@@ -217,13 +239,13 @@ Format:
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "mistralai/mistral-7b-instruct:free",
+        model: "google/gemma-2-9b-it:free",
 
         messages: [
           {
             role: "system",
             content:
-              "You are a JSON generator. Always return valid JSON only.",
+              "You are a JSON generator. Return only valid JSON.",
           },
           {
             role: "user",
@@ -239,6 +261,8 @@ Format:
           "Content-Type":
             "application/json",
         },
+
+        timeout: 60000,
       }
     );
 
@@ -247,11 +271,27 @@ Format:
         ?.content || "";
 
     console.log(
-      "RAW EXPLANATION RESPONSE:"
+      "✅ RAW EXPLANATION RESPONSE:"
     );
+
     console.log(rawText);
 
-    const data = extractJSON(rawText);
+    let data = [];
+
+    try {
+      data = extractJSON(rawText);
+    } catch (err) {
+      console.error(
+        "❌ JSON Parse Failed:",
+        err
+      );
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "AI returned invalid explanation JSON",
+      });
+    }
 
     if (!data || data.length === 0) {
       return res.status(500).json({
@@ -261,17 +301,20 @@ Format:
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       explanation: data[0],
     });
   } catch (error) {
     console.error(
-      "Generate Explanation Error:",
-      error?.response?.data || error.message
+      "❌ Generate Explanation Error:"
     );
 
-    res.status(500).json({
+    console.error(error);
+
+    console.error(error?.response?.data);
+
+    return res.status(500).json({
       success: false,
       message:
         "Failed to generate explanation",
