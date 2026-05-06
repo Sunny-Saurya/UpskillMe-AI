@@ -31,7 +31,7 @@ const CreateSessionForm = () => {
   };
 
   // ==========================================
-  // Create Session
+  // Handle Create Session
   // ==========================================
   const handleCreateSession = async (e) => {
     e.preventDefault();
@@ -43,9 +43,9 @@ const CreateSessionForm = () => {
       description,
     } = formData;
 
-    // ======================================
+    // ==========================================
     // Validation
-    // ======================================
+    // ==========================================
     if (!role || !topicsToFocus) {
       setError("Please fill all required fields.");
       return;
@@ -55,9 +55,9 @@ const CreateSessionForm = () => {
     setIsLoading(true);
 
     try {
-      // ======================================
+      // ==========================================
       // STEP 1: Generate AI Questions
-      // ======================================
+      // ==========================================
       const aiResponse = await axiosInstance.post(
         API_PATHS.AI.GENERATE_QUESTIONS,
         {
@@ -69,41 +69,71 @@ const CreateSessionForm = () => {
       );
 
       console.log(
-        "✅ AI RESPONSE:",
+        "✅ FULL AI RESPONSE:",
         aiResponse.data
       );
 
-      // ======================================
-      // Extract Questions Properly
-      // ======================================
-      const generatedQuestions = Array.isArray(
-        aiResponse.data
-      )
-        ? aiResponse.data
-        : aiResponse.data.questions;
+      let generatedQuestions = [];
+
+      // ==========================================
+      // CASE 1: Direct Array
+      // ==========================================
+      if (Array.isArray(aiResponse.data)) {
+        generatedQuestions = aiResponse.data;
+      }
+
+      // ==========================================
+      // CASE 2: questions array inside object
+      // ==========================================
+      else if (
+        Array.isArray(aiResponse.data.questions)
+      ) {
+        generatedQuestions =
+          aiResponse.data.questions;
+      }
+
+      // ==========================================
+      // CASE 3: Stringified JSON
+      // ==========================================
+      else if (
+        typeof aiResponse.data.questions ===
+        "string"
+      ) {
+        try {
+          generatedQuestions = JSON.parse(
+            aiResponse.data.questions
+          );
+        } catch (err) {
+          console.error(
+            "❌ JSON Parse Error:",
+            err
+          );
+        }
+      }
 
       console.log(
         "✅ GENERATED QUESTIONS:",
         generatedQuestions
       );
 
-      // ======================================
+      // ==========================================
       // Validation
-      // ======================================
+      // ==========================================
       if (
         !generatedQuestions ||
         generatedQuestions.length === 0
       ) {
         toast.error(
-          "Questions were not generated"
+          "Questions generation failed"
         );
+
         setIsLoading(false);
         return;
       }
 
-      // ======================================
+      // ==========================================
       // STEP 2: Create Session
-      // ======================================
+      // ==========================================
       const sessionPayload = {
         role,
         experience,
@@ -127,9 +157,9 @@ const CreateSessionForm = () => {
         response.data
       );
 
-      // ======================================
+      // ==========================================
       // Success
-      // ======================================
+      // ==========================================
       if (response?.data?.session?._id) {
         toast.success(
           "Session created successfully!"
@@ -145,7 +175,7 @@ const CreateSessionForm = () => {
       }
     } catch (error) {
       console.error(
-        "❌ FULL ERROR:",
+        "❌ CREATE SESSION ERROR:",
         error
       );
 
@@ -154,14 +184,9 @@ const CreateSessionForm = () => {
         error?.response?.data
       );
 
-      console.error(
-        "❌ ERROR MESSAGE:",
-        error?.message
-      );
-
       setError(
         error?.response?.data?.message ||
-          "Failed to create session. Please try again."
+          "Failed to create session"
       );
 
       toast.error(
