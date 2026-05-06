@@ -20,6 +20,9 @@ const CreateSessionForm = () => {
 
   const navigate = useNavigate();
 
+  // ==========================================
+  // Handle Input Change
+  // ==========================================
   const handleChange = (key, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -27,6 +30,9 @@ const CreateSessionForm = () => {
     }));
   };
 
+  // ==========================================
+  // Create Session
+  // ==========================================
   const handleCreateSession = async (e) => {
     e.preventDefault();
 
@@ -37,9 +43,9 @@ const CreateSessionForm = () => {
       description,
     } = formData;
 
-    // =========================
+    // ======================================
     // Validation
-    // =========================
+    // ======================================
     if (!role || !topicsToFocus) {
       setError("Please fill all required fields.");
       return;
@@ -49,9 +55,9 @@ const CreateSessionForm = () => {
     setIsLoading(true);
 
     try {
-      // =========================
+      // ======================================
       // STEP 1: Generate AI Questions
-      // =========================
+      // ======================================
       const aiResponse = await axiosInstance.post(
         API_PATHS.AI.GENERATE_QUESTIONS,
         {
@@ -67,36 +73,37 @@ const CreateSessionForm = () => {
         aiResponse.data
       );
 
-      // =========================
+      // ======================================
       // Extract Questions Properly
-      // =========================
-      const generatedQuestions =
-        aiResponse?.data?.questions ||
-        aiResponse?.data ||
-        [];
+      // ======================================
+      const generatedQuestions = Array.isArray(
+        aiResponse.data
+      )
+        ? aiResponse.data
+        : aiResponse.data.questions;
 
       console.log(
         "✅ GENERATED QUESTIONS:",
         generatedQuestions
       );
 
-      // =========================
-      // Check Questions
-      // =========================
+      // ======================================
+      // Validation
+      // ======================================
       if (
         !generatedQuestions ||
         generatedQuestions.length === 0
       ) {
         toast.error(
-          "AI failed to generate questions."
+          "Questions were not generated"
         );
         setIsLoading(false);
         return;
       }
 
-      // =========================
+      // ======================================
       // STEP 2: Create Session
-      // =========================
+      // ======================================
       const sessionPayload = {
         role,
         experience,
@@ -120,9 +127,9 @@ const CreateSessionForm = () => {
         response.data
       );
 
-      // =========================
+      // ======================================
       // Success
-      // =========================
+      // ======================================
       if (response?.data?.session?._id) {
         toast.success(
           "Session created successfully!"
@@ -133,7 +140,7 @@ const CreateSessionForm = () => {
         );
       } else {
         toast.error(
-          "Session created but ID missing."
+          "Session created but session ID missing."
         );
       }
     } catch (error) {
@@ -159,7 +166,7 @@ const CreateSessionForm = () => {
 
       toast.error(
         error?.response?.data?.message ||
-          "Failed to create session"
+          "Something went wrong"
       );
     } finally {
       setIsLoading(false);
@@ -181,6 +188,9 @@ const CreateSessionForm = () => {
         onSubmit={handleCreateSession}
         className="flex flex-col gap-3"
       >
+        {/* ================================= */}
+        {/* Role */}
+        {/* ================================= */}
         <Input
           value={formData.role}
           onChange={(e) =>
@@ -194,6 +204,9 @@ const CreateSessionForm = () => {
           type="text"
         />
 
+        {/* ================================= */}
+        {/* Experience */}
+        {/* ================================= */}
         <Input
           value={formData.experience}
           onChange={(e) =>
@@ -207,6 +220,9 @@ const CreateSessionForm = () => {
           type="number"
         />
 
+        {/* ================================= */}
+        {/* Topics */}
+        {/* ================================= */}
         <Input
           value={formData.topicsToFocus}
           onChange={(e) =>
@@ -220,6 +236,9 @@ const CreateSessionForm = () => {
           type="text"
         />
 
+        {/* ================================= */}
+        {/* Description */}
+        {/* ================================= */}
         <Input
           value={formData.description}
           onChange={(e) =>
@@ -229,16 +248,22 @@ const CreateSessionForm = () => {
             )
           }
           label="Description"
-          placeholder="(e.g. Frontend interview preparation)"
+          placeholder="(e.g. Frontend Interview Preparation)"
           type="text"
         />
 
+        {/* ================================= */}
+        {/* Error */}
+        {/* ================================= */}
         {error && (
           <p className="text-red-500 text-xs">
             {error}
           </p>
         )}
 
+        {/* ================================= */}
+        {/* Submit Button */}
+        {/* ================================= */}
         <button
           type="submit"
           className="btn-primary w-full mt-2"
