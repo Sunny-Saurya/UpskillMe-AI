@@ -11,7 +11,7 @@ const Login = ({ setCurrentPage }) => {
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
 
-  const {updateUser} = useContext(UserContext);
+  const { updateUser } = useContext(UserContext);
 
   const navigate = useNavigate();
 
@@ -19,15 +19,15 @@ const Login = ({ setCurrentPage }) => {
     e.preventDefault();
     // Add your login logic here
 
-    if(!validateEmail(email)) {
+    if (!validateEmail(email)) {
       setError("Please enter a valid email address.");
       return;
     }
-    if(!password){
+    if (!password) {
       setError("Password cannot be empty.");
       return;
     }
-    if(password.length < 8) {
+    if (password.length < 8) {
       setError("Password must be at least 8 characters long.");
       return;
     }
@@ -38,32 +38,32 @@ const Login = ({ setCurrentPage }) => {
     // Login api call
 
 
- try {
-  const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
-    email: email.trim(),
-    password: password.trim()
-  });
+    try {
+      const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
+        email: email.trim(),
+        password: password.trim()
+      });
 
-  console.log("Login Response:", response.data); // ✅
+      console.log("Login Response:", response.data); // ✅
 
-  const { token } = response.data;
+      const { token } = response.data;
 
-  if (token) {
-    localStorage.setItem("token", token);
-    updateUser(response.data);
-    navigate("/dashboard");
-  } else {
-    setError("Login failed: Invalid response from server.");
-  }
+      if (token) {
+        localStorage.setItem("token", token);
+        updateUser(response.data);
+        navigate("/dashboard");
+      } else {
+        setError("Login failed: Invalid response from server.");
+      }
 
-} catch (error) {
-  console.error("Login error:", error); // ✅
-  if (error.response?.data?.message) {
-    setError(error.response.data.message);
-  } else {
-    setError("An unexpected error occurred. Please try again later.");
-  }
-}
+    } catch (error) {
+      console.error("Login error:", error); // ✅
+      if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("An unexpected error occurred. Please try again later.");
+      }
+    }
 
 
 
@@ -99,7 +99,7 @@ const Login = ({ setCurrentPage }) => {
         <button className="btn-primary" type='submit'>LOGIN</button>
         <p className="text-[13px] text-slate-800 mt-3">
           Don't have an account?{" "}
-          <button className="font-medium text-primary underline cursor-pointer" onClick={() =>{
+          <button className="font-medium text-primary underline cursor-pointer" onClick={() => {
             setCurrentPage("signup");
           }}>SignUp</button>
 

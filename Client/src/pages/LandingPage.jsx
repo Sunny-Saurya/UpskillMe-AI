@@ -32,7 +32,7 @@ const LandingPage = () => {
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-[#FFFCEF] to-amber-50 relative overflow-hidden">
       {/* Animated background elements */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.2 }}
         transition={{ duration: 1.5 }}
@@ -98,7 +98,7 @@ const LandingPage = () => {
         {/* Hero Section */}
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Left Content */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
@@ -121,20 +121,20 @@ const LandingPage = () => {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
               <span className="block">Ace Your Next</span>
-               <span
-                  className="text-transparent bg-clip-text"
-                  style={{
-                    backgroundImage: "radial-gradient(circle, #FF9324 0%, #FCD760 100%)",
-                    backgroundSize: "200% 200%",
-                    animation: "text-shine 3s linear infinite"
-                  }}
-                >
-                  Technical Interview
-                </span>
+              <span
+                className="text-transparent bg-clip-text"
+                style={{
+                  backgroundImage: "radial-gradient(circle, #FF9324 0%, #FCD760 100%)",
+                  backgroundSize: "200% 200%",
+                  animation: "text-shine 3s linear infinite"
+                }}
+              >
+                Technical Interview
+              </span>
             </h1>
 
             <p className="text-lg text-gray-700 mb-8 max-w-lg">
-              Get role-specific interview questions, AI-powered feedback, and personalized coaching to 
+              Get role-specific interview questions, AI-powered feedback, and personalized coaching to
               transform your interview skills.
             </p>
 
@@ -161,7 +161,7 @@ const LandingPage = () => {
               </motion.button>
             </div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
@@ -179,7 +179,7 @@ const LandingPage = () => {
           </motion.div>
 
           {/* Right Image */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -188,13 +188,13 @@ const LandingPage = () => {
             <div className="relative">
               <div className="absolute -inset-4 bg-gradient-to-r from-amber-300 to-amber-500 rounded-3xl opacity-20 blur-xl"></div>
               <div className="absolute -inset-1 bg-gradient-to-r from-amber-300 to-amber-500 rounded-3xl opacity-10 blur-lg"></div>
-              <img 
-                src={HERO_IMG} 
-                alt="Interview Prep Illustration" 
-                className="relative w-full rounded-2xl shadow-2xl border-8 border-white z-10" 
+              <img
+                src={HERO_IMG}
+                alt="Interview Prep Illustration"
+                className="relative w-full rounded-2xl shadow-2xl border-8 border-white z-10"
               />
             </div>
-            
+
             <motion.div
               animate={{
                 y: [0, -10, 0],
@@ -263,7 +263,7 @@ const LandingPage = () => {
       </section>
 
       <AnimatedTestimonialsDemo />
-      
+
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-white to-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">

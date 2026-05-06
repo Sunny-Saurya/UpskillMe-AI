@@ -18,17 +18,17 @@ const ProfileInfoCard = () => {
       <div className="w-full bg-white shadow-md px-6 py-3 flex justify-between items-center">
         {/* Logo on the left */}
 
-<div className="flex items-center space-x-2">
-  {/* Icon Box */}
-  <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center">
-    <LuSparkles className="text-white text-lg" />
-  </div>
+        <div className="flex items-center space-x-2">
+          {/* Icon Box */}
+          <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center">
+            <LuSparkles className="text-white text-lg" />
+          </div>
 
-  {/* Text Logo */}
-  <div className="text-xl font-bold text-amber-600 select-none">
-    UpskillMe <span className="text-gray-900">AI</span>
-  </div>
-</div>
+          {/* Text Logo */}
+          <div className="text-xl font-bold text-amber-600 select-none">
+            UpskillMe <span className="text-gray-900">AI</span>
+          </div>
+        </div>
 
         {/* Profile section on the right */}
         <div className="flex items-center space-x-4">

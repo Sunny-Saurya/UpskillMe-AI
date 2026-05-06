@@ -48,7 +48,7 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
@@ -111,7 +111,7 @@ const Dashboard = () => {
             </motion.button>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -132,7 +132,7 @@ const Dashboard = () => {
                     role={data?.role || ""}
                     topicsToFocus={data?.topicsToFocus || ""}
                     experience={data?.experience || ""}
-                    
+
                     description={data?.description || ""}
                     lastUpdated={
                       data?.updatedAt
@@ -183,18 +183,18 @@ const Dashboard = () => {
             >
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-800">Create New Session</h2>
-                <button 
+                <button
                   onClick={() => setOpenCreateModal(false)}
                   className="text-gray-500 hover:text-gray-700"
                 >
                   ✕
                 </button>
               </div>
-              <CreateSessionForm 
+              <CreateSessionForm
                 onSuccess={() => {
                   setOpenCreateModal(false);
                   fetchAllSessions();
-                }} 
+                }}
               />
             </motion.div>
           </Modal>
@@ -261,14 +261,14 @@ const Dashboard = () => {
         )}
       </AnimatePresence>
       {/* Chatbot Floating Button */}
-<motion.button
-  whileHover={{ scale: 1.1 }}
-  whileTap={{ scale: 0.95 }}
-  onClick={() => toast("This feature is coming soon 🚧")}
-  className="fixed bottom-8 right-8 z-20 w-14 h-14 rounded-full bg-amber-600 text-white shadow-xl flex items-center justify-center"
->
-  <LuMessageCircle className="text-2xl" />
-</motion.button>
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => toast("This feature is coming soon 🚧")}
+        className="fixed bottom-8 right-8 z-20 w-14 h-14 rounded-full bg-amber-600 text-white shadow-xl flex items-center justify-center"
+      >
+        <LuMessageCircle className="text-2xl" />
+      </motion.button>
 
     </DashboardLayout>
   );

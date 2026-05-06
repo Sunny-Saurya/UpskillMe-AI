@@ -1,30 +1,30 @@
-export const BASE_URL = "https://upskillme-ai.onrender.com" || "http://localhost:8000";
+export const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 // export const BASE_URL = "http://localhost:8000";
 export const API_PATHS = {
-    AUTH:{
+    AUTH: {
         REGISTER: "/api/auth/register",
         LOGIN: "/api/auth/login",
         GET_PROFILE: "/api/auth/profile",
     },
 
-    IMAGE:{
+    IMAGE: {
         UPLOAD_IMAGE: "/api/auth/upload-image",
 
     },
-    AI:{
+    AI: {
         GENERATE_QUESTIONS: "/api/ai/generate-questions",
         GENERATE_EXPLANATION: "/api/ai/generate-explanation",
         UPLOAD_MORE_QUESTIONS: "/api/ai/upload-more-questions"
     },
 
-    SESSION:{
+    SESSION: {
         CREATE: "/api/sessions/create",
         GET_ALL: "/api/sessions/my-sessions",
         GET_ONE: (id) => `/api/sessions/${id}`,
         DELETE: (id) => `/api/sessions/${id}`,
     },
 
-    QUESTION:{
+    QUESTION: {
         ADD_TO_SESSION: "/api/questions/add",
         PIN: (id) => `/api/questions/${id}/pin`,
         UPDATAE_NOTE: (id) => `/api/questions/${id}/note`,
