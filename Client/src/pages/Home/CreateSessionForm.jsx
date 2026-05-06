@@ -1,22 +1,22 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import Input from "../../components/Inputs/Input";
-import SpinnerLoader from '../../components/Loader/SpinnerLoader';
-import axiosInstance from '../../utils/axiosInstance';
-import { API_PATHS } from '../../utils/apiPaths';
+import SpinnerLoader from "../../components/Loader/SpinnerLoader";
+import axiosInstance from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPaths";
 
 const CreateSessionForm = () => {
   const [formData, setFormData] = React.useState({
-    role: '',
-    experience: '',
-    topicsToFocus: '',
-    description: '',
+    role: "",
+    experience: "",
+    topicsToFocus: "",
+    description: "",
   });
 
   const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState(null);
+  const [error, setError] = React.useState("");
 
   const navigate = useNavigate();
 
@@ -37,8 +37,11 @@ const CreateSessionForm = () => {
       description,
     } = formData;
 
-    if (!role || !experience || !topicsToFocus) {
-      setError("Please fill all the required fields.");
+    // =========================
+    // Validation
+    // =========================
+    if (!role || !topicsToFocus) {
+      setError("Please fill all required fields.");
       return;
     }
 
@@ -46,9 +49,9 @@ const CreateSessionForm = () => {
     setIsLoading(true);
 
     try {
-      // ============================
-      // Generate AI Questions
-      // ============================
+      // =========================
+      // STEP 1: Generate AI Questions
+      // =========================
       const aiResponse = await axiosInstance.post(
         API_PATHS.AI.GENERATE_QUESTIONS,
         {
@@ -59,39 +62,105 @@ const CreateSessionForm = () => {
         }
       );
 
-      console.log("AI RESPONSE:", aiResponse.data);
-
-      // FIXED LINE
-      const generatedQuestions =
-        aiResponse.data.questions;
-
-      // ============================
-      // Create Session
-      // ============================
-      const response = await axiosInstance.post(
-        API_PATHS.SESSION.CREATE,
-        {
-          ...formData,
-          questions: generatedQuestions,
-        }
+      console.log(
+        "✅ AI RESPONSE:",
+        aiResponse.data
       );
 
-      console.log("SESSION RESPONSE:", response.data);
+      // =========================
+      // Extract Questions Properly
+      // =========================
+      const generatedQuestions =
+        aiResponse?.data?.questions ||
+        aiResponse?.data ||
+        [];
 
-      if (response.data?.session?._id) {
-        toast.success("Session created successfully!");
+      console.log(
+        "✅ GENERATED QUESTIONS:",
+        generatedQuestions
+      );
+
+      // =========================
+      // Check Questions
+      // =========================
+      if (
+        !generatedQuestions ||
+        generatedQuestions.length === 0
+      ) {
+        toast.error(
+          "AI failed to generate questions."
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      // =========================
+      // STEP 2: Create Session
+      // =========================
+      const sessionPayload = {
+        role,
+        experience,
+        topicsToFocus,
+        description,
+        questions: generatedQuestions,
+      };
+
+      console.log(
+        "🚀 SESSION PAYLOAD:",
+        sessionPayload
+      );
+
+      const response = await axiosInstance.post(
+        API_PATHS.SESSION.CREATE,
+        sessionPayload
+      );
+
+      console.log(
+        "✅ SESSION RESPONSE:",
+        response.data
+      );
+
+      // =========================
+      // Success
+      // =========================
+      if (response?.data?.session?._id) {
+        toast.success(
+          "Session created successfully!"
+        );
 
         navigate(
           `/interview-prep/${response.data.session._id}`
         );
+      } else {
+        toast.error(
+          "Session created but ID missing."
+        );
       }
     } catch (error) {
       console.error(
-        "❌ Error creating session:",
-        error?.response?.data || error.message
+        "❌ FULL ERROR:",
+        error
       );
 
-      setError("Failed to create session. Please try again.");
+      console.error(
+        "❌ ERROR RESPONSE:",
+        error?.response?.data
+      );
+
+      console.error(
+        "❌ ERROR MESSAGE:",
+        error?.message
+      );
+
+      setError(
+        error?.response?.data?.message ||
+          "Failed to create session. Please try again."
+      );
+
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to create session"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -104,8 +173,8 @@ const CreateSessionForm = () => {
       </h3>
 
       <p className="text-xs text-slate-700 mt-[5px] mb-3">
-        Fill out the form below to create a new
-        interview preparation session.
+        Fill out the form below to create a
+        new interview preparation session.
       </p>
 
       <form
@@ -115,7 +184,10 @@ const CreateSessionForm = () => {
         <Input
           value={formData.role}
           onChange={(e) =>
-            handleChange('role', e.target.value)
+            handleChange(
+              "role",
+              e.target.value
+            )
           }
           label="Role"
           placeholder="(e.g. Software Engineer, Data Scientist)"
@@ -125,7 +197,10 @@ const CreateSessionForm = () => {
         <Input
           value={formData.experience}
           onChange={(e) =>
-            handleChange('experience', e.target.value)
+            handleChange(
+              "experience",
+              e.target.value
+            )
           }
           label="Experience (Years)"
           placeholder="(e.g. 1, 2, 3)"
@@ -136,12 +211,12 @@ const CreateSessionForm = () => {
           value={formData.topicsToFocus}
           onChange={(e) =>
             handleChange(
-              'topicsToFocus',
+              "topicsToFocus",
               e.target.value
             )
           }
           label="Topics to Focus"
-          placeholder="(e.g. Data Structures, Algorithms, System Design)"
+          placeholder="(e.g. DSA, React, System Design)"
           type="text"
         />
 
@@ -149,12 +224,12 @@ const CreateSessionForm = () => {
           value={formData.description}
           onChange={(e) =>
             handleChange(
-              'description',
+              "description",
               e.target.value
             )
           }
           label="Description"
-          placeholder="(e.g. Brief description of your preparation goals)"
+          placeholder="(e.g. Frontend interview preparation)"
           type="text"
         />
 
