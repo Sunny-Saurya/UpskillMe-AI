@@ -1,23 +1,47 @@
 const axios = require("axios");
 
-// ===============================
-// Extract JSON safely
-// ===============================
+// ======================================
+// Safely Extract JSON
+// ======================================
 const extractJSON = (rawText) => {
-  const start = rawText.indexOf("[");
-  const end = rawText.lastIndexOf("]");
+  try {
+    // Remove markdown if exists
+    const cleanedText = rawText
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
-  if (start !== -1 && end !== -1) {
-    return JSON.parse(rawText.substring(start, end + 1));
+    // Find JSON array
+    const start = cleanedText.indexOf("[");
+    const end = cleanedText.lastIndexOf("]");
+
+    if (start !== -1 && end !== -1) {
+      const jsonString = cleanedText.substring(
+        start,
+        end + 1
+      );
+
+      return JSON.parse(jsonString);
+    }
+
+    throw new Error("Invalid JSON response");
+  } catch (error) {
+    console.error(
+      "JSON Extraction Error:",
+      error
+    );
+
+    return [];
   }
-
-  throw new Error("Invalid JSON response");
 };
 
-// ===============================
+// ======================================
 // Generate Interview Questions
-// ===============================
-const generateInterviewQuestions = async (req, res) => {
+// ======================================
+const generateInterviewQuestions = async (
+  req,
+  res
+) => {
   try {
     const {
       role,
@@ -26,6 +50,20 @@ const generateInterviewQuestions = async (req, res) => {
       numberOfQuestions,
     } = req.body;
 
+    // ==================================
+    // Validation
+    // ==================================
+    if (!role || !topicsToFocus) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Role and Topics are required",
+      });
+    }
+
+    // ==================================
+    // Prompt
+    // ==================================
     const prompt = `
 Generate ${numberOfQuestions} interview questions with answers.
 
@@ -33,73 +71,114 @@ Role: ${role}
 Experience: ${experience}
 Topics: ${topicsToFocus}
 
-Rules:
-- Return ONLY valid JSON
+IMPORTANT RULES:
+- Return ONLY valid JSON array
 - No markdown
-- No extra explanation
-- Each object must contain:
-  - question
-  - answer
+- No explanation
+- No extra text
+- No code block
 
-Example:
+Format:
 [
   {
     "question": "What is React?",
-    "answer": "React is a JavaScript library used for building user interfaces."
-  },
-  {
-    "question": "What is Node.js?",
-    "answer": "Node.js is a JavaScript runtime built on Chrome's V8 engine."
+    "answer": "React is a JavaScript library for building UI."
   }
 ]
 `;
 
+    // ==================================
+    // OpenRouter Request
+    // ==================================
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "openrouter/free",
+        model: "mistralai/mistral-7b-instruct:free",
+
         messages: [
+          {
+            role: "system",
+            content:
+              "You are a JSON generator. Always return only valid JSON.",
+          },
           {
             role: "user",
             content: prompt,
           },
         ],
+
+        temperature: 0.3,
       },
       {
         headers: {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
+          "Content-Type":
+            "application/json",
         },
       }
     );
 
+    // ==================================
+    // Extract Response
+    // ==================================
     const rawText =
-      response.data.choices[0].message.content;
+      response?.data?.choices?.[0]?.message
+        ?.content || "";
 
-    console.log("QUESTIONS RESPONSE:", rawText);
+    console.log(
+      "RAW QUESTIONS RESPONSE:"
+    );
+    console.log(rawText);
 
-    const data = extractJSON(rawText);
+    // ==================================
+    // Parse JSON
+    // ==================================
+    const questions = extractJSON(rawText);
 
+    console.log(
+      "PARSED QUESTIONS:",
+      questions
+    );
+
+    // ==================================
+    // Validation
+    // ==================================
+    if (
+      !questions ||
+      !Array.isArray(questions) ||
+      questions.length === 0
+    ) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "Failed to generate valid questions",
+      });
+    }
+
+    // ==================================
+    // Success Response
+    // ==================================
     res.status(200).json({
       success: true,
-      questions: data,
+      questions,
     });
   } catch (error) {
     console.error(
       "Generate Questions Error:",
-      error.response?.data || error.message
+      error?.response?.data || error.message
     );
 
     res.status(500).json({
       success: false,
-      message: "Failed to generate questions",
+      message:
+        "Failed to generate questions",
     });
   }
 };
 
-// ===============================
+// ======================================
 // Generate Concept Explanation
-// ===============================
+// ======================================
 const generateConceptExplanation = async (
   req,
   res
@@ -115,24 +194,13 @@ const generateConceptExplanation = async (
     }
 
     const prompt = `
-Explain this interview question in very deep detail for interview preparation.
-
-Include:
-- definition
-- real-world analogy
-- why it is important
-- detailed explanation
-- code example
-- best practices
-- common mistakes
-
-Make explanation beginner-friendly but detailed.
+Explain this interview question in detail.
 
 Question:
 ${question}
 
-Rules:
-- Return ONLY valid JSON
+IMPORTANT RULES:
+- Return ONLY valid JSON array
 - No markdown
 - No extra text
 
@@ -140,8 +208,8 @@ Format:
 [
   {
     "title": "React State",
-    "explanation": "State in React is used to store dynamic data inside components...",
-    "example": "Example: const [count, setCount] = useState(0)"
+    "explanation": "Detailed explanation...",
+    "example": "const [count, setCount] = useState(0)"
   }
 ]
 `;
@@ -149,46 +217,71 @@ Format:
     const response = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "openrouter/free",
+        model: "mistralai/mistral-7b-instruct:free",
+
         messages: [
+          {
+            role: "system",
+            content:
+              "You are a JSON generator. Always return valid JSON only.",
+          },
           {
             role: "user",
             content: prompt,
           },
         ],
+
+        temperature: 0.3,
       },
       {
         headers: {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
+          "Content-Type":
+            "application/json",
         },
       }
     );
 
     const rawText =
-      response.data.choices[0].message.content;
+      response?.data?.choices?.[0]?.message
+        ?.content || "";
 
-    console.log("EXPLANATION RESPONSE:", rawText);
+    console.log(
+      "RAW EXPLANATION RESPONSE:"
+    );
+    console.log(rawText);
 
     const data = extractJSON(rawText);
 
-    res.status(200).json(data[0]);
+    if (!data || data.length === 0) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "Failed to generate explanation",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      explanation: data[0],
+    });
   } catch (error) {
     console.error(
       "Generate Explanation Error:",
-      error.response?.data || error.message
+      error?.response?.data || error.message
     );
 
     res.status(500).json({
       success: false,
-      message: "Failed to generate explanation",
+      message:
+        "Failed to generate explanation",
     });
   }
 };
 
-// ===============================
+// ======================================
 // Generate More Questions
-// ===============================
+// ======================================
 const generateMoreQuestions = async (
   req,
   res
